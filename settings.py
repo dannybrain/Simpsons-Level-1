@@ -1,0 +1,29 @@
+# game options/settings
+TITLE = "Simpsons Level-1"
+WIDTH = 1024
+HEIGHT = 768
+FPS = 60
+TILESIZE = 32
+GRIDWIDTH = WIDTH / TILESIZE
+GRIDHEIGHT = HEIGHT / TILESIZE
+
+# Player properties
+PLAYER_ACC = 0.5
+PLAYER_FRICTION = -0.12
+KEY_REPEAT = (200, 60)
+
+# define colors
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
+DARK_GREY = (27, 27, 27)
+LIGHT_GREY = (100, 100, 100)
+BGCOLOR = DARK_GREY
+
+# map
+MAP_FILE = "map.txt"
+MAP_WALL = '1'
+MAP_PLAYER = 'X'
