@@ -1,8 +1,9 @@
 #!/usr/bin/env python
-# Simpsons Level-1
-# A simple platformer inspired by Mario-Level-1 and by the
-# amazing "Game development with pygame" serie by KidsCanCode
+"""Simpsons Level-1 A simple platformer
 
+   Inspired by Mario-Level-1 and by the  amazing
+   "Game development with pygame" serie by KidsCanCode
+"""
 __author__ = "Daniel Biehle"
 __email__ = "dannybrain@dannybrain.org"
 __version__ = 0.1
@@ -11,9 +12,16 @@ from os import path
 import pygame as pg
 from settings import *
 from sprites import Player, Wall
+from tilemap import Map
 
 class Game:
-    "Main Game class"
+    """Main game class
+
+        public attributes:
+        - sprite groups : all_sprites, walls, player
+        - map : simple class representing the map (read from map.txt)
+        - dt : delta (tick)
+    """
 
     def __init__(self):
         "initialize game window, etc"
@@ -26,24 +34,22 @@ class Game:
         self.running = True
         self.playing = True
         self.all_sprites = []
-        self.map_data = []
+        self.map = None
         self.player = None
         self.walls = None
+        self.dt = 0
 
     def new(self):
         "start a new game"
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-        #self.all_sprites.add(self.player)
-        self.load_data()
+        self.load_map()
         self.run()
 
-    def load_data(self):
-        mapdir = path.dirname(__file__)
-        with open(path.join(mapdir, MAP_FILE), 'r') as f:
-            for lines in f:
-                self.map_data.append(lines)
-        for row, tiles in enumerate(self.map_data):
+    def load_map(self):
+        pathname = path.dirname(__file__)
+        self.map = Map(path.join(pathname, MAP_FILE))
+        for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == MAP_WALL:
                     Wall(self, col, row)
@@ -54,6 +60,7 @@ class Game:
         "Game Loop"
         self.playing = True
         while self.playing:
+            self.dt = self.clock.tick(FPS) / 1000
             self.clock.tick(FPS)
             self.events()
             self.update()
@@ -75,14 +82,6 @@ class Game:
                 if event.key in (pg.K_q, pg.K_ESCAPE):
                     self.running = False
                     self.playing = False
-                if event.key == pg.K_UP:
-                    self.player.move(dy=-1)
-                if event.key == pg.K_DOWN:
-                    self.player.move(dy=1)
-                if event.key == pg.K_LEFT:
-                    self.player.move(dx=-1)
-                if event.key == pg.K_RIGHT:
-                    self.player.move(dx=1)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
