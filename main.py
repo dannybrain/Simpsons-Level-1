@@ -12,7 +12,7 @@ from os import path
 import pygame as pg
 from settings import *
 from sprites import Player, Wall
-from tilemap import Map
+from tilemap import Map, Camera
 
 class Game:
     """Main game class
@@ -37,6 +37,7 @@ class Game:
         self.map = None
         self.player = None
         self.walls = None
+        self.camera = None
         self.dt = 0
 
     def new(self):
@@ -44,11 +45,13 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
         self.load_map()
+        self.camera = Camera(self.map.width, self.map.height)
         self.run()
 
     def load_map(self):
         pathname = path.dirname(__file__)
         self.map = Map(path.join(pathname, MAP_FILE))
+        #print(self.map)
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == MAP_WALL:
@@ -60,7 +63,7 @@ class Game:
         "Game Loop"
         self.playing = True
         while self.playing:
-            self.dt = self.clock.tick(FPS) / 1000
+            self.dt = self.clock.tick(FPS) / 800
             self.clock.tick(FPS)
             self.events()
             self.update()
@@ -69,6 +72,7 @@ class Game:
     def update(self):
         "Game Loop - Update"
         self.all_sprites.update()
+        self.camera.update(self.player)
 
     def events(self):
         "Game Loop - events"
@@ -91,9 +95,12 @@ class Game:
 
     def draw(self):
         "Game Loop - draw"
+        self.show_debug()
         self.screen.fill(BGCOLOR)
-        self.all_sprites.draw(self.screen)
         self.draw_grid()
+        #self.all_sprites.draw(self.screen)
+        for sprite in self.all_sprites:
+            self.screen.blit(sprite.image, self.camera.apply(sprite))
         # *after* drawing everything, flip the display
         pg.display.flip()
 
@@ -105,6 +112,18 @@ class Game:
         "game over/continue"
         pass
 
+    def show_debug(self):
+        self.debug(f"""x={int(self.player.x)},
+                       y={int(self.player.y)},
+                       dt={self.dt},
+                       cameratopleft={self.camera.camera.topleft}""")
+
+    def debug(self, text):
+        "display message on screen : debug purpose"
+        font = pg.font.Font(pg.font.get_default_font(), 11)
+        antialias = True
+        color = RED
+        self.screen.blit(font.render(text, antialias, color), (0, 0))
 
 def main():
     mygame = Game()
