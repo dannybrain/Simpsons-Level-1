@@ -27,7 +27,7 @@ class Game:
         "initialize game window, etc"
         pg.init()
         pg.mixer.init()
-        pg.key.set_repeat(*KEY_REPEAT)
+        #pg.key.set_repeat(*KEY_REPEAT)
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
@@ -73,7 +73,7 @@ class Game:
         "Game Loop"
         self.playing = True
         while self.playing:
-            self.dt = self.clock.tick(FPS) / 800
+            #self.dt = self.clock.tick(FPS) / 800
             self.clock.tick(FPS)
             self.events()
             self.update()
@@ -126,6 +126,9 @@ class Game:
         self.debug(f"""x={int(self.player.pos.x)}
                     y={int(self.player.pos.y)}
                     dt={int(self.dt)}
+                    acc={self.player.acc.x}
+                    velx={self.player.vel.x}
+                    vely={self.player.vel.y}
                     cameratopleft={self.camera.camera.topleft}""")
 
     def debug(self, text):
@@ -134,7 +137,7 @@ class Game:
         antialias = True
         color = RED
         debug_msg = font.render(text, antialias, color)
-        self.screen.blit(debug_msg, (0, 0)) 
+        self.screen.blit(debug_msg, (0, 0))
 
 def main():
     mygame = Game()

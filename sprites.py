@@ -32,22 +32,15 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
 
     def get_keys(self):
-        self.vel = vec(0, 0)
         # acceleration is 0 unless a key is pressed
-        self.acc = vec(0, 0)
+        self.acc = vec(0, GRAVITY)
         keys = pg.key.get_pressed()
         if keys[pg.K_LEFT] or keys[pg.K_a]:
-            self.vel.x = -PLAYER_SPEED
+            self.acc.x = -PLAYER_ACC
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
-            self.vel.x = PLAYER_SPEED
-        if keys[pg.K_UP] or keys[pg.K_w]:
-            self.vel.y = -PLAYER_SPEED
-        if keys[pg.K_DOWN] or keys[pg.K_s]:
-            self.vel.y = PLAYER_SPEED
-        # if we move diagnoly we need to offset the
-        # speed a bit (using pythagorian)
-        if self.vel.x != 0 and self.vel.y != 0:
-            self.vel *= 0.7
+            self.acc.x = PLAYER_ACC
+        if keys[pg.K_SPACE]:
+            self.jump()
 
     def collide_with_walls(self, dx=0, dy=0):
         for wall in self.game.walls:
@@ -55,12 +48,25 @@ class Player(pg.sprite.Sprite):
                 return True
         return False
 
+    def jump(self):
+        # jump only if on a platform
+        if self.vel.y <= 0:
+            #self.rect.x += 1
+            #hits = pg.sprite.spritecollide(self, self.game.walls, False)
+            #self.rect.x -= 1
+            #if hits:
+            self.vel.y = -40
+
     def update(self):
         self.get_keys()
         self.move()
 
     def move(self):
-        self.pos += self.game.dt * self.vel
+        # physics...
+        self.acc.x += self.vel.x * PLAYER_FRICTION
+        self.vel += self.acc
+        self.pos += self.vel + 0.5 * self.acc
+
         self.rect.x = self.pos.x
         self.check_collision(direction='x')
         self.rect.y = self.pos.y
