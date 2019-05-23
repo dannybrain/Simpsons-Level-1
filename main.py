@@ -38,20 +38,30 @@ class Game:
         self.player = None
         self.walls = None
         self.camera = None
+        self.player_img = None
         self.dt = 0
 
     def new(self):
         "start a new game"
         self.all_sprites = pg.sprite.Group()
         self.walls = pg.sprite.Group()
-        self.load_map()
+        self.load_data()
         self.camera = Camera(self.map.width, self.map.height)
         self.run()
 
-    def load_map(self):
-        pathname = path.dirname(__file__)
-        self.map = Map(path.join(pathname, MAP_FILE))
-        #print(self.map)
+    def load_data(self):
+        game_folder = path.dirname(__file__)
+        self.load_map(game_folder)
+        sprites_folder = path.join(game_folder, "spritesheets")
+        self.load_sprites(sprites_folder)
+
+    def load_sprites(self, sprites_folder):
+        homer_img_path = path.join(sprites_folder, "homerx.png")
+        self.player.set_image(pg.image.load(homer_img_path).convert_alpha())
+
+    def load_map(self, game_folder):
+        """ load map and initialise self.player and instanciates Walls"""
+        self.map = Map(path.join(game_folder, MAP_FILE))
         for row, tiles in enumerate(self.map.data):
             for col, tile in enumerate(tiles):
                 if tile == MAP_WALL:
@@ -95,13 +105,13 @@ class Game:
 
     def draw(self):
         "Game Loop - draw"
-        self.show_debug()
         self.screen.fill(BGCOLOR)
         self.draw_grid()
         #self.all_sprites.draw(self.screen)
         for sprite in self.all_sprites:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
         # *after* drawing everything, flip the display
+        self.show_debug()
         pg.display.flip()
 
     def show_start_screen(self):
@@ -113,17 +123,18 @@ class Game:
         pass
 
     def show_debug(self):
-        self.debug(f"""x={int(self.player.x)},
-                       y={int(self.player.y)},
-                       dt={self.dt},
-                       cameratopleft={self.camera.camera.topleft}""")
+        self.debug(f"""x={int(self.player.pos.x)}
+                    y={int(self.player.pos.y)}
+                    dt={int(self.dt)}
+                    cameratopleft={self.camera.camera.topleft}""")
 
     def debug(self, text):
         "display message on screen : debug purpose"
         font = pg.font.Font(pg.font.get_default_font(), 11)
         antialias = True
         color = RED
-        self.screen.blit(font.render(text, antialias, color), (0, 0))
+        debug_msg = font.render(text, antialias, color)
+        self.screen.blit(debug_msg, (0, 0)) 
 
 def main():
     mygame = Game()
